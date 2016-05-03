@@ -1,0 +1,15 @@
+.frame {
+    width: 1.4em;
+    height: 1.3em;
+    background: rgba(0, 0, 0, 0.55);
+    color: rgba(255, 255, 255, 0.94);
+    font-size: 4em;
+    align-content: center;
+    display: inline-block;
+    text-align: center;
+    margin: 0.03em;
+}
+.picked {
+    background: rgba(0, 0, 0, 0.34);
+    color: rgba(255, 255, 255, 0.70);
+}
