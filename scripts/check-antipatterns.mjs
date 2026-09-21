@@ -41,6 +41,9 @@ async function collect(directory) {
 
 const violations = [];
 for (const path of await collect(root)) {
+  if (relative(root, path) === "scripts/check-antipatterns.mjs") {
+    continue;
+  }
   const source = await readFile(path, "utf8");
   const lines = source.split(/\r?\n/u);
   lines.forEach((line, index) => {
