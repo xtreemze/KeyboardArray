@@ -1,7 +1,18 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  "plugins": [
+    {
+      "path": "./lint/no-unsafe-type-assertions.grit",
+      "includes": ["src/**/*.ts", "e2e/**/*.ts"]
+    },
+    {
+      "path": "./lint/no-browser-antipatterns.grit",
+      "includes": ["src/**/*.ts"]
+    }
+  ],
   "files": {
-    "ignoreUnknown": true
+    "ignoreUnknown": true,
+    "includes": ["**", "!!dist", "!!playwright-report", "!!test-results"]
   },
   "formatter": {
     "enabled": true,
@@ -11,8 +22,15 @@
   },
   "linter": {
     "enabled": true,
+    "domains": {
+      "playwright": "all",
+      "project": "all",
+      "test": "all",
+      "types": "all"
+    },
     "rules": {
-      "preset": "recommended"
+      "preset": "all",
+      "nursery": "error"
     }
   },
   "javascript": {
