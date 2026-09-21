@@ -5,8 +5,8 @@
 body {
   margin: 0;
   padding: 1rem;
-  background: Canvas;
-  color: CanvasText;
+  background: canvas;
+  color: canvastext;
   font-family: system-ui, sans-serif;
 }
 
@@ -26,16 +26,16 @@ body {
 .frame {
   display: grid;
   place-items: center;
-  border: 1px solid ButtonBorder;
-  background: ButtonFace;
-  color: ButtonText;
+  border: 1px solid buttonborder;
+  background: buttonface;
+  color: buttontext;
   font: inherit;
   font-size: 2rem;
 }
 
 .frame:focus-visible,
 .reset:focus-visible {
-  outline: 0.2rem solid Highlight;
+  outline: 0.2rem solid highlight;
   outline-offset: 0.15rem;
 }
 
