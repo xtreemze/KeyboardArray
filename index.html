@@ -1,18 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Keyboard Array</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-	<div id="abcs">
-	</div>
-
-	<button id="reset" onclick="populate(reset);">Reset</button>
-	<script src="script.js"></script>
-
+  <main>
+    <h1>Keyboard Array</h1>
+    <div id="abcs" class="keyboard-grid" aria-label="Letters"></div>
+    <button id="reset" class="reset" type="button">Reset</button>
+  </main>
+  <script type="module" src="script.js"></script>
 </body>
-
 </html>
