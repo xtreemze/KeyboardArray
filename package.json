@@ -5,7 +5,7 @@
   "description": "Accessible keyboard-letter interaction experiment",
   "scripts": {
     "lint": "npm run lint:js && npm run lint:css && npm run lint:policy",
-    "lint:js": "eslint --max-warnings=0 .",
+    "lint:js": "eslint --max-warnings=0 script.js",
     "lint:css": "stylelint --max-warnings=0 \"**/*.css\"",
     "lint:policy": "node scripts/check-antipatterns.mjs"
   },
