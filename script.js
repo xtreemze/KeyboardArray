@@ -1,41 +1,37 @@
-abc = "abcdefghijklmnopqrstuvwxyz".toUpperCase();
-construct = {
-  name: 'abc',
-  class: ''
-};
-letters = [];
-for(i = 0; i < abc.length; i++) {
-  letters[i] = Object.create(construct);
-  letters[i].name = abc[i];
-};
-pick = function (id) {
-  letters[id].class = "picked";
-  el = document.getElementById(id);
-  el.classList.add("picked");
-  el.disabled = true;
-  return id;
-};
-listAvailable = function () {
-  for(i = 0; i < abc.length; i++) {
-    if(letters[i].class == 'unpicked') {
-      console.log(letters[i].name + ' ' + letters[i].class);
-    } else {
-      console.log(letters[i].name + ' ' + letters[i].class);
-    }
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const lettersRoot = document.querySelector("#abcs");
+const resetControl = document.querySelector("#reset");
+const selectedLetters = new Set();
+
+if (!(lettersRoot instanceof HTMLElement) || !(resetControl instanceof HTMLButtonElement)) {
+  throw new TypeError("KeyboardArray requires its letter container and reset button.");
+}
+
+function createLetterButton(letter) {
+  const button = document.createElement("button");
+  button.className = "frame";
+  button.type = "button";
+  button.textContent = letter;
+  button.disabled = selectedLetters.has(letter);
+  button.classList.toggle("picked", button.disabled);
+  button.addEventListener("click", () => {
+    selectedLetters.add(letter);
+    render();
+  });
+  return button;
+}
+
+function render() {
+  const fragment = document.createDocumentFragment();
+  for (const letter of alphabet) {
+    fragment.append(createLetterButton(letter));
   }
-};
-populate = function (reset) {
-  var data = "";
-  for(i = 0; i < abc.length; i++) {
-    if(reset) {
-      letters[i].class = "";
-    }
-    name = letters[i].name;
-    classes = letters[i].class;
-    clickEvent = "pick('button#" + i + ", '" + i + "'');";
-    data = data + "<button id='" + i + "' class='frame " + classes + "' onclick=" + 'pick(' + i + ');' + ">" + name + "</button>";
-  }
-  document.getElementById('abcs').innerHTML = data;
-};
-populate();
-reset = true;
+  lettersRoot.replaceChildren(fragment);
+}
+
+resetControl.addEventListener("click", () => {
+  selectedLetters.clear();
+  render();
+});
+
+render();
