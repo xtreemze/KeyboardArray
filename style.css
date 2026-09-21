@@ -1,16 +1,44 @@
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  padding: 1rem;
+  background: Canvas;
+  color: CanvasText;
+  font-family: system-ui, sans-serif;
+}
+
+.keyboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr));
+  gap: 0.25rem;
+  inline-size: 100%;
+}
+
+.frame,
+.reset {
+  min-inline-size: 2.75rem;
+  min-block-size: 2.75rem;
+}
+
 .frame {
-    width: 1.4em;
-    height: 1.3em;
-    background: rgba(0, 0, 0, 0.55);
-    color: rgba(255, 255, 255, 0.94);
-    font-size: 4em;
-    align-content: center;
-    display: inline-block;
-    text-align: center;
-    margin: 0.03em;
+  display: grid;
+  place-items: center;
+  border: 1px solid ButtonBorder;
+  background: ButtonFace;
+  color: ButtonText;
+  font: inherit;
+  font-size: 2rem;
+}
+
+.frame:focus-visible,
+.reset:focus-visible {
+  outline: 0.2rem solid Highlight;
+  outline-offset: 0.15rem;
 }
 
 .picked {
-    background: rgba(0, 0, 0, 0.34);
-    color: #fff;
+  opacity: 0.55;
 }
