@@ -1,0 +1,38 @@
+engine biome(1.0)
+language js(typescript, jsx)
+
+or {
+    `navigator.userAgent` as $bad where {
+        register_diagnostic(span = $bad, severity = "error", message = "Do not branch on user-agent strings. Use capability detection or standards-based feature queries.")
+    },
+    `navigator.platform` as $bad where {
+        register_diagnostic(span = $bad, severity = "error", message = "Do not branch on platform identity. Use capabilities and explicit domain state.")
+    },
+    `navigator.vendor` as $bad where {
+        register_diagnostic(span = $bad, severity = "error", message = "Do not branch on browser vendor identity.")
+    },
+    `window.innerWidth` as $bad where {
+        register_diagnostic(span = $bad, severity = "error", message = "Do not drive responsive behavior from viewport-width JavaScript. Prefer CSS/container queries or ResizeObserver for geometry.")
+    },
+    `window.innerHeight` as $bad where {
+        register_diagnostic(span = $bad, severity = "error", message = "Do not drive responsive behavior from viewport-height JavaScript. Prefer CSS/container queries or ResizeObserver for geometry.")
+    },
+    `screen.width` as $bad where {
+        register_diagnostic(span = $bad, severity = "error", message = "Do not infer layout/device class from screen dimensions.")
+    },
+    `screen.height` as $bad where {
+        register_diagnostic(span = $bad, severity = "error", message = "Do not infer layout/device class from screen dimensions.")
+    },
+    `$element.innerHTML = $value` as $bad where {
+        register_diagnostic(span = $bad, severity = "error", message = "Do not inject HTML strings. Build DOM nodes explicitly so structure and escaping remain inspectable.")
+    },
+    `$element.outerHTML = $value` as $bad where {
+        register_diagnostic(span = $bad, severity = "error", message = "Do not replace DOM through HTML strings.")
+    },
+    `$element.insertAdjacentHTML($position, $value)` as $bad where {
+        register_diagnostic(span = $bad, severity = "error", message = "Do not inject HTML strings with insertAdjacentHTML.")
+    },
+    `document.write($value)` as $bad where {
+        register_diagnostic(span = $bad, severity = "error", message = "document.write is forbidden.")
+    }
+}
