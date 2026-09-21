@@ -1,0 +1,42 @@
+name: Bootstrap lockfile
+
+on:
+  push:
+    branches: ["modernize/vite-typescript"]
+    paths:
+      - "package.json"
+      - ".github/workflows/bootstrap-lockfile.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  lockfile:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: modernize/vite-typescript
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: Enable pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@12.5.1 --activate
+
+      - name: Generate deterministic lockfile
+        run: pnpm install --lockfile-only
+
+      - name: Commit lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: generate pnpm lockfile"
+          git push origin HEAD:modernize/vite-typescript
