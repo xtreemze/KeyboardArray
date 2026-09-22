@@ -26,4 +26,6 @@ pnpm exec playwright install chromium
 pnpm e2e
 ```
 
+The same quality gates run in GitHub Actions for every pull request and for pushes to `master`.
+
 The production build is emitted to `dist/` and is suitable for static hosting such as GitHub Pages.
