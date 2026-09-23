@@ -17,7 +17,7 @@ const forbidden = [
 const filesUnder = async (path) => {
   const entries = await readdir(new URL(`${path}/`, root), { withFileTypes: true });
   const nested = await Promise.all(
-    entries.map(async (entry) => {
+    entries.map((entry) => {
       const child = join(path, entry.name);
       if (entry.isDirectory()) {
         return filesUnder(child);
