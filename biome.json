@@ -3,16 +3,26 @@
   "plugins": [
     {
       "path": "./lint/no-unsafe-type-assertions.grit",
-      "includes": ["src/**/*.ts", "e2e/**/*.ts"]
+      "includes": [
+        "src/**/*.ts",
+        "e2e/**/*.ts"
+      ]
     },
     {
       "path": "./lint/no-browser-antipatterns.grit",
-      "includes": ["src/**/*.ts"]
+      "includes": [
+        "src/**/*.ts"
+      ]
     }
   ],
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!!dist", "!!playwright-report", "!!test-results"]
+    "includes": [
+      "**",
+      "!!dist",
+      "!!playwright-report",
+      "!!test-results"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -42,11 +52,26 @@
   },
   "overrides": [
     {
-      "includes": ["playwright.config.ts", "vite.config.ts"],
+      "includes": [
+        "playwright.config.ts",
+        "vite.config.ts"
+      ],
       "linter": {
         "rules": {
           "style": {
             "noDefaultExport": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "scripts/**/*.mjs"
+      ],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noNodejsModules": "off"
           }
         }
       }
