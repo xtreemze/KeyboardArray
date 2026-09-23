@@ -2,7 +2,7 @@ engine biome(1.0)
 language js(typescript, jsx)
 
 `$value as $type` as $assertion where {
-  !$assertion <: or {
+  ! $assertion <: or {
     `$_ as const`,
     `$_ as unknown`,
     `$_ as keyof $_`
