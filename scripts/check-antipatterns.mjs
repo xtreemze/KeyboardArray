@@ -5,6 +5,9 @@ import process from "node:process";
 const root = new URL("../", import.meta.url);
 const checkedRoots = ["src", "e2e"];
 const checkedExtensions = new Set([".ts", ".tsx", ".js", ".jsx", ".css", ".html"]);
+const workflowFilePattern = /\.ya?ml$/u;
+const workflowActionPattern = /^\s*uses:\s*(?<action>[^\s#]+)/gmu;
+const fullCommitShaPattern = /^[0-9a-f]{40}$/u;
 const forbidden = [
   [/@ts-ignore\b/u, "@ts-ignore is forbidden; fix or encode the type invariant."],
   [/@ts-expect-error\b/u, "@ts-expect-error is forbidden; model the boundary explicitly."],
@@ -52,7 +55,7 @@ for (const { path, source } of sources) {
 
 const workflowEntries = (
   await readdir(new URL(".github/workflows/", root), { withFileTypes: true })
-).filter((entry) => entry.isFile() && /\.ya?ml$/u.test(entry.name));
+).filter((entry) => entry.isFile() && workflowFilePattern.test(entry.name));
 const workflowSources = await Promise.all(
   workflowEntries.map(async (entry) => ({
     name: entry.name,
@@ -60,7 +63,7 @@ const workflowSources = await Promise.all(
   })),
 );
 for (const { name, source } of workflowSources) {
-  for (const match of source.matchAll(/^\s*uses:\s*(?<action>[^\s#]+)/gmu)) {
+  for (const match of source.matchAll(workflowActionPattern)) {
     const action = match.groups?.action;
     if (action && !action.startsWith("./") && !action.startsWith("docker://")) {
       const separator = action.lastIndexOf("@");
@@ -68,7 +71,7 @@ for (const { name, source } of workflowSources) {
       if (separator >= 0) {
         ref = action.slice(separator + 1);
       }
-      if (!/^[0-9a-f]{40}$/u.test(ref)) {
+      if (!fullCommitShaPattern.test(ref)) {
         violations.push(
           `.github/workflows/${name}: ${action} must use a full immutable commit SHA`,
         );
