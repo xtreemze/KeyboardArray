@@ -65,7 +65,7 @@ export const mountKeyboardArray = ({
       button.type = "button";
       button.className = "letter";
       button.textContent = letter;
-      button.dataset["letter"] = letter;
+      button.setAttribute("data-letter", letter);
       button.disabled = picked.has(letter);
       button.setAttribute("aria-pressed", String(picked.has(letter)));
 
