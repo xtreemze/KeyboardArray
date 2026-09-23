@@ -50,6 +50,27 @@ for (const { path, source } of sources) {
   }
 }
 
+const workflowEntries = await readdir(new URL(".github/workflows/", root), { withFileTypes: true });
+for (const entry of workflowEntries) {
+  if (!entry.isFile() || !/\.ya?ml$/u.test(entry.name)) {
+    continue;
+  }
+  const source = await readFile(new URL(`.github/workflows/${entry.name}`, root), "utf8");
+  for (const match of source.matchAll(/^\s*uses:\s*([^\s#]+)/gmu)) {
+    const action = match[1];
+    if (action.startsWith("./") || action.startsWith("docker://")) {
+      continue;
+    }
+    const separator = action.lastIndexOf("@");
+    const ref = separator >= 0 ? action.slice(separator + 1) : "";
+    if (!/^[0-9a-f]{40}$/u.test(ref)) {
+      violations.push(
+        `.github/workflows/${entry.name}: ${action} must use a full immutable commit SHA`,
+      );
+    }
+  }
+}
+
 const packageJson = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
 for (const group of ["dependencies", "devDependencies", "optionalDependencies"]) {
   for (const [name, version] of Object.entries(packageJson[group] ?? {})) {
