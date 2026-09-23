@@ -1,4 +1,31 @@
-export const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" as const;
+export const alphabet: readonly string[] = [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
+];
 
 export interface KeyboardArrayElements {
   readonly lettersRoot: HTMLElement;
@@ -11,21 +38,26 @@ export interface KeyboardArrayController {
   readonly reset: () => void;
 }
 
-export function mountKeyboardArray({
+export const mountKeyboardArray = ({
   lettersRoot,
   resetButton,
   status,
-}: KeyboardArrayElements): KeyboardArrayController {
+}: KeyboardArrayElements): KeyboardArrayController => {
   const picked = new Set<string>();
 
-  const availableLetters = () => Array.from(alphabet).filter((letter) => !picked.has(letter));
+  const availableLetters = (): readonly string[] =>
+    alphabet.filter((letter): boolean => !picked.has(letter));
 
-  const updateStatus = () => {
+  const updateStatus = (): void => {
     const available = availableLetters().length;
-    status.value = `${available} letter${available === 1 ? "" : "s"} available`;
+    let suffix = "s";
+    if (available === 1) {
+      suffix = "";
+    }
+    status.value = `${available} letter${suffix} available`;
   };
 
-  const render = () => {
+  const render = (): void => {
     const fragment = document.createDocumentFragment();
 
     for (const letter of alphabet) {
@@ -35,9 +67,9 @@ export function mountKeyboardArray({
       button.textContent = letter;
       button.dataset.letter = letter;
       button.disabled = picked.has(letter);
-      button.setAttribute("aria-pressed", picked.has(letter) ? "true" : "false");
+      button.setAttribute("aria-pressed", String(picked.has(letter)));
 
-      button.addEventListener("click", () => {
+      button.addEventListener("click", (): void => {
         picked.add(letter);
         render();
       });
@@ -49,7 +81,7 @@ export function mountKeyboardArray({
     updateStatus();
   };
 
-  const reset = () => {
+  const reset = (): void => {
     picked.clear();
     render();
   };
@@ -58,4 +90,4 @@ export function mountKeyboardArray({
   render();
 
   return { availableLetters, reset };
-}
+};
