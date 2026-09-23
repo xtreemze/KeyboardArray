@@ -50,23 +50,29 @@ for (const { path, source } of sources) {
   }
 }
 
-const workflowEntries = await readdir(new URL(".github/workflows/", root), { withFileTypes: true });
-for (const entry of workflowEntries) {
-  if (!entry.isFile() || !/\.ya?ml$/u.test(entry.name)) {
-    continue;
-  }
-  const source = await readFile(new URL(`.github/workflows/${entry.name}`, root), "utf8");
-  for (const match of source.matchAll(/^\s*uses:\s*([^\s#]+)/gmu)) {
-    const action = match[1];
-    if (action.startsWith("./") || action.startsWith("docker://")) {
-      continue;
-    }
-    const separator = action.lastIndexOf("@");
-    const ref = separator >= 0 ? action.slice(separator + 1) : "";
-    if (!/^[0-9a-f]{40}$/u.test(ref)) {
-      violations.push(
-        `.github/workflows/${entry.name}: ${action} must use a full immutable commit SHA`,
-      );
+const workflowEntries = (
+  await readdir(new URL(".github/workflows/", root), { withFileTypes: true })
+).filter((entry) => entry.isFile() && /\.ya?ml$/u.test(entry.name));
+const workflowSources = await Promise.all(
+  workflowEntries.map(async (entry) => ({
+    name: entry.name,
+    source: await readFile(new URL(`.github/workflows/${entry.name}`, root), "utf8"),
+  })),
+);
+for (const { name, source } of workflowSources) {
+  for (const match of source.matchAll(/^\s*uses:\s*(?<action>[^\s#]+)/gmu)) {
+    const action = match.groups?.action;
+    if (action && !action.startsWith("./") && !action.startsWith("docker://")) {
+      const separator = action.lastIndexOf("@");
+      let ref = "";
+      if (separator >= 0) {
+        ref = action.slice(separator + 1);
+      }
+      if (!/^[0-9a-f]{40}$/u.test(ref)) {
+        violations.push(
+          `.github/workflows/${name}: ${action} must use a full immutable commit SHA`,
+        );
+      }
     }
   }
 }
