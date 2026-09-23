@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { alphabet, mountKeyboardArray } from "./keyboard-array";
+import { alphabet, mountKeyboardArray } from "./keyboard-array.ts";
 
 describe("mountKeyboardArray", () => {
   beforeEach(() => {
@@ -23,13 +23,13 @@ describe("mountKeyboardArray", () => {
     const first = lettersRoot.querySelector<HTMLButtonElement>('[data-letter="A"]');
 
     expect(lettersRoot.querySelectorAll("button")).toHaveLength(alphabet.length);
-    expect(controller.availableLetters()).toHaveLength(26);
+    expect(controller.availableLetters()).toHaveLength(alphabet.length);
 
     first?.click();
 
-    expect(controller.availableLetters()).toHaveLength(25);
+    expect(controller.availableLetters()).toHaveLength(alphabet.length - 1);
     expect(lettersRoot.querySelector<HTMLButtonElement>('[data-letter="A"]')?.disabled).toBe(true);
-    expect(status.value).toBe("25 letters available");
+    expect(status.value).toBe(`${alphabet.length - 1} letters available`);
   });
 
   it("reset restores all letters", () => {
@@ -45,7 +45,7 @@ describe("mountKeyboardArray", () => {
     lettersRoot.querySelector<HTMLButtonElement>('[data-letter="Z"]')?.click();
     resetButton.click();
 
-    expect(controller.availableLetters()).toHaveLength(26);
-    expect(status.value).toBe("26 letters available");
+    expect(controller.availableLetters()).toHaveLength(alphabet.length);
+    expect(status.value).toBe(`${alphabet.length} letters available`);
   });
 });
