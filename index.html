@@ -1,17 +1,31 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Keyboard Array</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <main>
-    <h1>Keyboard Array</h1>
-    <div id="abcs" class="keyboard-grid" aria-label="Letters"></div>
-    <button id="reset" class="reset" type="button">Reset</button>
-  </main>
-  <script type="module" src="script.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="An interactive A–Z keyboard array" />
+    <title>Keyboard Array</title>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <p class="eyebrow">Keyboard Array</p>
+        <h1>Pick letters from A to Z</h1>
+        <p class="intro">
+          Select letters to mark them as picked. Reset restores the full array.
+        </p>
+      </header>
+
+      <section aria-label="Letters">
+        <fieldset id="letters" class="letters" aria-label="Alphabet"></fieldset>
+      </section>
+
+      <div class="actions">
+        <button id="reset" type="button">Reset</button>
+        <output id="status" aria-live="polite">26 letters available</output>
+      </div>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>

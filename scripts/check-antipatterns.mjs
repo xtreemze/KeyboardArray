@@ -1,63 +1,71 @@
-import { readFile, readdir } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { extname, join, relative } from "node:path";
 import process from "node:process";
 
-const root = process.cwd();
-const extensions = new Set([".css", ".html", ".js", ".mjs"]);
-const rules = [
-  ["unsafe-html-sink", /\b(?:innerHTML|outerHTML)\s*=|\binsertAdjacentHTML\s*\(|\bdocument\.write\s*\(/u, "String-to-DOM sinks are forbidden; construct nodes and use textContent."],
-  ["dynamic-code", /\beval\s*\(|\bnew\s+Function\s*\(/u, "Dynamic code execution is forbidden."],
-  ["inline-event-handler", /\son[a-z]+\s*=/iu, "Inline event attributes are forbidden; use addEventListener."],
-  ["zoom-restriction", /\b(?:maximum-scale\s*=\s*1|user-scalable\s*=\s*no)\b/iu, "Viewport zoom restrictions are forbidden."],
-  ["device-sniffing", /\bnavigator\.(?:userAgent|platform)\b/u, "UA/platform sniffing is forbidden."],
-  ["js-layout-breakpoint", /\b(?:window\.)?(?:innerWidth|innerHeight)\b|\bscreen\.(?:width|height)\b/u, "JavaScript layout breakpoints are forbidden; use CSS/container queries."],
-  ["mouse-touch-specific-handler", /addEventListener\(\s*["'](?:mouse(?:down|up|move|enter|leave)|touch(?:start|move|end|cancel))["']/u, "Mouse/touch-specific handlers are forbidden; use pointer events and keyboard semantics."],
-  ["desktop-first-query", /@(?:media|container)[^{\n]*\bmax-width\s*:/iu, "Descending max-width queries are forbidden; use mobile-first ascending queries."],
-  ["viewport-unit-trap", /\b100v[wh]\b/iu, "100vh/100vw are forbidden."],
-  ["overflow-masking", /\boverflow(?:-[xy])?\s*:\s*(?:hidden|clip)\b/iu, "Overflow masking is forbidden as a layout repair."],
-  ["transition-all", /\btransition\s*:\s*all\b/iu, "transition: all is forbidden."],
-  ["important", /!important\b/iu, "!important is forbidden."],
-  ["physical-horizontal-css", /\b(?:left|right|margin-left|margin-right|padding-left|padding-right|border-left|border-right)\s*:/iu, "Physical left/right CSS is forbidden; use logical properties."],
-  ["ambient-nondeterminism", /\bMath\.random\s*\(|\bDate\.now\s*\(|\bnew\s+Date\s*\(/u, "Ambient time/randomness is forbidden in domain behavior."],
-  ["broad-lint-suppression", /(?:eslint|stylelint)-disable\b|\bNOLINT(?:NEXTLINE|BEGIN|END)?\b/u, "Inline lint suppressions are forbidden."],
+const root = new URL("../", import.meta.url);
+const checkedRoots = ["src", "e2e"];
+const checkedExtensions = new Set([".ts", ".tsx", ".js", ".jsx", ".css", ".html"]);
+const forbidden = [
+  [/@ts-ignore\b/u, "@ts-ignore is forbidden; fix or encode the type invariant."],
+  [/@ts-expect-error\b/u, "@ts-expect-error is forbidden; model the boundary explicitly."],
+  [/@ts-nocheck\b/u, "@ts-nocheck is forbidden."],
+  [/biome-ignore\b/u, "Biome suppression comments are forbidden."],
+  [/eslint-disable\b/u, "ESLint suppression comments are forbidden."],
+  [/prettier-ignore\b/u, "Formatter suppression comments are forbidden."],
 ];
 
-async function collect(directory) {
-  const entries = await readdir(directory, { withFileTypes: true });
-  const files = [];
-  for (const entry of entries) {
-    if (entry.name === "node_modules" || entry.name === ".git") {
-      continue;
-    }
-    const path = join(directory, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...await collect(path));
-    } else if (extensions.has(extname(entry.name))) {
-      files.push(path);
-    }
-  }
-  return files;
-}
+const filesUnder = async (path) => {
+  const entries = await readdir(new URL(`${path}/`, root), { withFileTypes: true });
+  const nested = await Promise.all(
+    entries.map((entry) => {
+      const child = join(path, entry.name);
+      if (entry.isDirectory()) {
+        return filesUnder(child);
+      }
+      if (checkedExtensions.has(extname(entry.name))) {
+        return [child];
+      }
+      return [];
+    }),
+  );
+  return nested.flat();
+};
+
+const paths = (await Promise.all(checkedRoots.map(filesUnder))).flat();
+const sources = await Promise.all(
+  paths.map(async (path) => ({
+    path,
+    source: await readFile(new URL(path, root), "utf8"),
+  })),
+);
 
 const violations = [];
-for (const path of await collect(root)) {
-  if (relative(root, path) === "scripts/check-antipatterns.mjs") {
-    continue;
-  }
-  const source = await readFile(path, "utf8");
-  const lines = source.split(/\r?\n/u);
-  lines.forEach((line, index) => {
-    for (const [name, pattern, message] of rules) {
+for (const { path, source } of sources) {
+  for (const [index, line] of source.split("\n").entries()) {
+    for (const [pattern, message] of forbidden) {
       if (pattern.test(line)) {
-        violations.push(`${relative(root, path)}:${index + 1}: ${name}: ${message}`);
+        violations.push(`${relative(".", path)}:${index + 1}: ${message}`);
       }
     }
-  });
+  }
+}
+
+const packageJson = JSON.parse(await readFile(new URL("package.json", root), "utf8"));
+for (const group of ["dependencies", "devDependencies", "optionalDependencies"]) {
+  for (const [name, version] of Object.entries(packageJson[group] ?? {})) {
+    if (/^(?:\^|~|>|<|=|\*|latest$|next$)/u.test(version)) {
+      violations.push(
+        `package.json: ${group}.${name} must use an exact reproducible version, got "${version}"`,
+      );
+    }
+  }
 }
 
 if (violations.length > 0) {
-  process.stderr.write(`KeyboardArray anti-pattern violations:\n  ${violations.join("\n  ")}\n`);
+  process.stderr.write(
+    `Repository anti-pattern policy violations:\n${violations.map((violation) => `  ${violation}`).join("\n")}\n`,
+  );
   process.exitCode = 1;
 } else {
-  process.stdout.write("KeyboardArray anti-pattern policy: clean\n");
+  process.stdout.write("Repository anti-pattern policy: clean\n");
 }

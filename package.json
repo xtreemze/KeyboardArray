@@ -1,28 +1,29 @@
 {
-  "name": "keyboardarray",
-  "version": "1.1.0",
+  "name": "keyboard-array",
+  "version": "2.0.0",
   "private": true,
-  "description": "Accessible keyboard-letter interaction experiment",
+  "type": "module",
+  "packageManager": "pnpm@12.5.1",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
-    "lint": "npm run lint:js && npm run lint:css && npm run lint:policy",
-    "lint:js": "eslint --max-warnings=0 script.js",
-    "lint:css": "stylelint --max-warnings=0 \"**/*.css\"",
-    "lint:policy": "node scripts/check-antipatterns.mjs"
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint:policy": "node scripts/check-antipatterns.mjs",
+    "check": "pnpm lint:policy && biome check --error-on-warnings .",
+    "typecheck": "tsc -b --pretty false",
+    "test": "vitest run",
+    "e2e": "playwright test"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/xtreemze/KeyboardArray.git"
-  },
-  "author": "Carlos Velasco",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/xtreemze/KeyboardArray/issues"
-  },
-  "homepage": "https://github.com/xtreemze/KeyboardArray#readme",
   "devDependencies": {
-    "@eslint/js": "10.0.1",
-    "eslint": "10.11.0",
-    "stylelint": "17.15.0",
-    "stylelint-config-standard": "40.0.0"
+    "@biomejs/biome": "2.5.14",
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.13.6",
+    "jsdom": "30.0.1",
+    "typescript": "7.0.2",
+    "vite": "8.3.0",
+    "vitest": "5.0.1"
   }
 }

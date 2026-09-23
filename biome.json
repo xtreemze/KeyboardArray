@@ -1,0 +1,68 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  "plugins": [
+    {
+      "path": "./lint/no-unsafe-type-assertions.grit",
+      "includes": ["src/**/*.ts", "e2e/**/*.ts"]
+    },
+    {
+      "path": "./lint/no-browser-antipatterns.grit",
+      "includes": ["src/**/*.ts"]
+    }
+  ],
+  "files": {
+    "ignoreUnknown": true,
+    "includes": ["**", "!!dist", "!!playwright-report", "!!test-results"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true,
+    "domains": {
+      "playwright": "all",
+      "project": "all",
+      "test": "all",
+      "types": "all"
+    },
+    "rules": {
+      "preset": "all",
+      "nursery": "error",
+      "correctness": {
+        "useQwikValidLexicalScope": "off"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "all"
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["playwright.config.ts", "vite.config.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["scripts/**/*.mjs"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noNodejsModules": "off"
+          }
+        }
+      }
+    }
+  ]
+}
