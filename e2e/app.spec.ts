@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("selecting and resetting letters remains usable", async ({ page }) => {
-  await page.goto("./");
+  await page.goto("http://127.0.0.1:4173/");
 
   const a = page.getByRole("button", { name: "A" });
   await expect(a).toBeEnabled();
