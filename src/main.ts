@@ -1,5 +1,5 @@
 import "./style.css";
-import { mountKeyboardArray } from "./keyboard-array";
+import { mountKeyboardArray } from "./keyboard-array.ts";
 
 const lettersRoot = document.querySelector<HTMLElement>("#letters");
 const resetButton = document.querySelector<HTMLButtonElement>("#reset");
